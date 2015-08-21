@@ -15,3 +15,14 @@ The scripts "mixed," "snowflake," "carpetmaker," and "generate" will create frac
 Alternatively, you can specify your own Iterated Function System (IFS) by creating an array of fixed points in three-dimensional space, named "h", along with an array of contraction ratios and rotation angles, named "t" and "theta," and finally specifying the number of iterations in a variable named "iterations." Be sure that the number of fixed points, ratios, and angles coincide. Finally, you can generate this image by running the script "dragonslayer."
 
 Note that since the number of points in a fractal grows exponentially with each iteration, the code will run slowly if you have a high number of iterations (>10) or a high number of functions in your IFS.
+
+## Errata 
+
+Original discussion [is here on Reddit](https://www.reddit.com/r/mathpics/comments/3euwzt/gallery_of_heisenberg_fractals/).
+
+Sauce examples are here (on [plot.ly](https://plot.ly)):
+
+* [Heisenberg Snowflake](https://plot.ly/~mlipton/8/)
+* [Heisenberg Dragon](https://plot.ly/~mlipton/24/)
+* [Heisenberg Interval](https://plot.ly/~mlipton/87/)
+* [Heisenberg Jaws](https://plot.ly/~mlipton/99/)
