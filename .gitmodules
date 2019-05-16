@@ -1,0 +1,5 @@
+[submodule "hex-cellular-automata"]
+	path = hex-cellular-automata
+	url = git@github.com:NewAlexandria/data-science-learning.git
+	branch = hex-cellular
+  depth = 1
