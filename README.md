@@ -9,3 +9,5 @@ I was recently moved by some work on hex-grid pattern generation, and I decided 
 * https://stackoverflow.com/q/22802708/263858
 * https://math.mit.edu/research/highschool/primes/materials/2014/conf/1-3-Nie.pdf
 * http://demonstrations.wolfram.com/HexLifeHexagonalCellularAutomata/
+* https://github.com/kgolid/byrne-generator
+* https://github.com/aleha84/simple.canvas.core2/blob/master/demo8/scenes/whirlpool2.js
