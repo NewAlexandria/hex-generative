@@ -3,3 +3,6 @@
 	url = git@github.com:NewAlexandria/data-science-learning.git
 	branch = hex-cellular
   depth = 1
+[submodule "hatch-automata"]
+	path = hatch-automata
+	url = https://github.com/kgolid/hatch-automata.git
