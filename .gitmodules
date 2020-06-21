@@ -6,3 +6,6 @@
 [submodule "hatch-automata"]
 	path = hatch-automata
 	url = https://github.com/kgolid/hatch-automata.git
+[submodule "apollon"]
+	path = apollon
+	url = https://github.com/lsandig/apollon.git
