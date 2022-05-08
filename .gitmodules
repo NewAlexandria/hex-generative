@@ -12,3 +12,6 @@
 [submodule "2021_10_07_Abstract_Art"]
 	path = 2021_10_07_Abstract_Art
 	url = https://github.com/nitzan-treg/2021_10_07_Abstract_Art.git
+[submodule "maze_generator"]
+	path = maze_generator
+	url = https://github.com/morriartie/maze_generator.git
