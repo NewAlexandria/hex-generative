@@ -15,3 +15,6 @@
 [submodule "maze_generator"]
 	path = maze_generator
 	url = https://github.com/morriartie/maze_generator.git
+[submodule "WaveFunctionCollapse"]
+	path = WaveFunctionCollapse
+	url = git@github.com:mxgmn/WaveFunctionCollapse.git
