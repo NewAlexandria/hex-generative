@@ -18,3 +18,6 @@
 [submodule "WaveFunctionCollapse"]
 	path = WaveFunctionCollapse
 	url = git@github.com:mxgmn/WaveFunctionCollapse.git
+[submodule "prvhash"]
+	path = prvhash
+	url = git@github.com:avaneev/prvhash.git
