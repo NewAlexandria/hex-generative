@@ -21,3 +21,6 @@
 [submodule "prvhash"]
 	path = prvhash
 	url = git@github.com:avaneev/prvhash.git
+[submodule "evo_floorplans"]
+	path = evo_floorplans
+	url = https://github.com/joel-simon/evo_floorplans.git
