@@ -24,3 +24,6 @@
 [submodule "evo_floorplans"]
 	path = evo_floorplans
 	url = https://github.com/joel-simon/evo_floorplans.git
+[submodule "Mazes"]
+	path = Mazes
+	url = https://github.com/Kirkezz/Mazes.git
