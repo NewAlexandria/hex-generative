@@ -27,3 +27,9 @@
 [submodule "Mazes"]
 	path = Mazes
 	url = https://github.com/Kirkezz/Mazes.git
+[submodule "TownGeneratorOS"]
+	path = TownGeneratorOS
+	url = https://github.com/watabou/TownGeneratorOS.git
+[submodule "x3139-chess"]
+	path = x3139-chess
+	url = https://github.com/Aversefun/x3139-chess.git

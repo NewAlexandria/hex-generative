@@ -13,6 +13,7 @@ I was recently moved by some work on hex-grid pattern generation, and I decided 
 * https://github.com/aleha84/simple.canvas.core2/blob/master/demo8/scenes/whirlpool2.js
 * https://github.com/swoerpel/TwitterPipeline
 * https://github.com/nschloe/meshio
+* https://www.boristhebrave.com/docs/sylves/1/
 
 graph control panel UIs
 
