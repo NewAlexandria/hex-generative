@@ -33,3 +33,6 @@
 [submodule "x3139-chess"]
 	path = x3139-chess
 	url = https://github.com/Aversefun/x3139-chess.git
+[submodule "hexx"]
+	path = hexx
+	url = https://github.com/ManevilleF/hexx
