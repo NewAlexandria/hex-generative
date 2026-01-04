@@ -1,0 +1,67 @@
+
+<!-- saved from url=(0041)https://www.fandom.com/silver-surfer.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><title>silver-surfer-storage-html</title>
+
+<style>.village-iframe{width:100%;height:100%;border:none;display:block;position:fixed;top:0;left:0;z-index:2147483647;background:#0000003d;color-scheme:light}.village-iframe.village-loading{display:flex;justify-content:center;align-items:center}.village-iframe>.village-spinner{width:1.5rem;height:1.5rem;border:2px solid #000;border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;animation:spin .45s linear infinite}.village-iframe.village-hidden{display:none}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.village-hidden{display:none}[village-paths-data=facepiles]{display:flex;align-items:center;padding-right:.5rem}[village-paths-data=facepiles] img{width:1.5rem;height:1.5rem;border-radius:50%;margin-right:-.5rem}[village-paths-data=facepiles] img.village-facepiler-avatar-not-found{filter:blur(7px)}[village-paths-data=facepiles] img:last-child{margin-right:0}[village-paths-data=count]{padding-right:.25rem}[village-paths-availability=error],[village-paths-availability=found],[village-paths-availability=not-found],[village-paths-availability=not-activated]{display:none!important}[village-paths-availability=loading]{display:inline-flex!important}</style><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style lang="en" type="text/css" id="dark-mode-custom-style"></style><style lang="en" type="text/css" id="dark-mode-native-style"></style><style lang="en" type="text/css" id="dark-mode-native-sheet"></style></head><body class="cross-domain-storage">
+	<script>
+		function getQueryVar(varName) {
+			// Grab and unescape the query string - appending an '&' keeps the RegExp simple
+			// for the sake of this example.
+			var queryStr = unescape(window.location.search) + '&';
+
+			// Dynamic replacement RegExp
+			var regex = new RegExp('.*?[&\\?]' + varName + '=(.*?)&.*');
+
+			// Apply RegExp to the query string
+			var val = queryStr.replace(regex, '$1');
+
+			// If the string is the same, we didn't find a match - return false
+			return val === queryStr ? false : val;
+		}
+
+		var isDev =
+			window.location.host.includes('fandom-dev') ||
+			window.location.host.includes('localhost') ||
+			window.location.hostname === '127.0.0.1';
+
+		var hasCanaryQueryParam = window.location.search.includes('ss_canary=true');
+		var bustCacheQueryParam = window.location.search.includes('ss_clear_cache=true');
+
+		var BRANCH_DEPLOY_NAME = 'ss_branch_deploy';
+		var isBranchBuild = window.location.search.includes(BRANCH_DEPLOY_NAME);
+		var branchName = isBranchBuild ? getQueryVar(BRANCH_DEPLOY_NAME).replace(/[^a-zA-Z0-9-_]/g, '').slice(0, 100) : '';
+
+		function scriptLocation(path) {
+			var ROOT_PATH = 'https://static.wikia.nocookie.net/silversurfer/';
+			var version = hasCanaryQueryParam ? 'canary' : 'latest';
+			var cachebuster =
+				bustCacheQueryParam || hasCanaryQueryParam || isBranchBuild ? '?cb='.concat(Date.now().toString()) : '';
+			var branchBuildString = isBranchBuild ? 'branch/'.concat(branchName) : '';
+
+			if (isBranchBuild) {
+				return ''
+					.concat(ROOT_PATH)
+					.concat(isDev ? 'dev' : 'prod', '/')
+					.concat(branchBuildString, '/')
+					.concat(path)
+					.concat(cachebuster);
+			}
+
+			return ''
+				.concat(ROOT_PATH)
+				.concat(isDev ? 'dev' : 'prod', '/')
+				.concat(branchBuildString)
+				.concat(version, '/')
+				.concat(path)
+				.concat(cachebuster);
+		}
+
+		// We do not want to load this script asynchronously
+		// because the page that embeds it uses iframe
+		// onLoad to call this script's functionality
+		var s = document.createElement('script');
+		s.setAttribute('src', scriptLocation('sdk-cross-domain.js'));
+		document.body.appendChild(s);
+	</script><script src="./sdk-cross-domain.js"></script>
+
+</body></html>

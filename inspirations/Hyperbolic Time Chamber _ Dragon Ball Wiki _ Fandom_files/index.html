@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<!-- saved from url=(0070)https://s0.2mdn.net/sadbundle/9577520566613573632/index.html?ev=01_262 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="./style.css">
+    <script>var clickTag = "http://www.google.com";</script><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style lang="en" type="text/css" id="dark-mode-custom-style"></style><style lang="en" type="text/css" id="dark-mode-native-style"></style><style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
+  <script type="text/javascript">
+    
+  (function() {
+    var MAX_URL_PARAM_LENGTH = 34;
+    var CLICK_X_URL_KEY = 'nx';
+    var CLICK_Y_URL_KEY = 'ny';
+    var CREATIVE_DIMENSIONS_KEY = 'dim';
+    var AD_URL_PARAM = '&adurl=';
+
+    var relegateNavigation = '';
+    var urlParamMap = {};
+
+    var isNewtonTokenSet = false;
+    var isTurtleXAdClick = false;
+    var reportingIds = {};
+
+    urlParamMap[CLICK_X_URL_KEY] = null;
+    urlParamMap[CLICK_Y_URL_KEY] = null;
+    urlParamMap[CREATIVE_DIMENSIONS_KEY] = null;
+
+    var handleClickTagMessage = function(e) {
+      try {
+        var eventData = JSON.parse(e.data);
+      } catch (err) {
+        return;
+      }
+      if (eventData.isInitClickTag) {
+        if (eventData.clickTags) {
+          for (var i = 0; i < eventData.clickTags.length; i++) {
+            var clkTag = eventData.clickTags[i];
+            window[clkTag.name] = clkTag.url;
+
+            if (clkTag.eTldPlusOne) {
+              eTldPlusOnes[clkTag.url] = clkTag.eTldPlusOne;
+            }
+            if (clkTag.reportingId) {
+              reportingIds[clkTag.url] = clkTag.reportingId;
+            }
+          }
+        } else if (eventData.clickTag) {
+          window.clickTag = eventData.clickTag;
+        }
+        relegateNavigation = eventData.relegateNavigation;
+      }
+      if (isNewtonEnabled(eventData) && !isNewtonTokenSet) {
+        var newtonOt2Token = eventData.newtonOt2Token;
+        enableAttributionReportingApi(newtonOt2Token);
+      }
+      if (eventData.isTurtleXAdClick) {
+        isTurtleXAdClick = true;
+      }
+    };
+
+    var isNewtonEnabled = function(eventData) {
+      return 'newtonOt2Token' in eventData;
+    }
+
+    var enableAttributionReportingApi = function(originTrialToken) {
+      if (/Chrome/.test(window.navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.httpEquiv = 'origin-trial';
+        meta.content = String(originTrialToken);
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        isNewtonTokenSet = true;
+      }
+    };
+
+    var storeClickCoordinates = function(e) {
+      urlParamMap[CLICK_X_URL_KEY] = Math.round(e.clientX);
+      urlParamMap[CLICK_Y_URL_KEY] = Math.round(e.clientY);
+    };
+
+    var getCreativeDimensions = function() {
+      return window.innerWidth + 'x' + window.innerHeight;
+    }
+
+    var getExitClickParams = function(e) {
+      urlParamMap[CREATIVE_DIMENSIONS_KEY] = getCreativeDimensions();
+
+      var exitParams = '';
+      for (var key in urlParamMap) {
+        exitParams += '&' + key + '=';
+        if (urlParamMap[key] !== null) {
+          exitParams += urlParamMap[key];
+        }
+      }
+      return exitParams;
+    }
+
+    var appendExitClickParams = function(url) {
+      var adUrlIndex = url.toLowerCase().indexOf(AD_URL_PARAM);
+      var paramsToBeAdded = getExitClickParams();
+      if (adUrlIndex > -1 && paramsToBeAdded.length <= MAX_URL_PARAM_LENGTH) {
+        url = url.substr(0, adUrlIndex) + paramsToBeAdded +
+          url.substr(adUrlIndex);
+      };
+      return url;
+    };
+
+    if (open.call) {
+      window.open = function(open) {
+        return function(url, name, features) {
+          if (isTurtleXAdClick && !!reportingIds[url]) {
+            var message = {
+              'reportingId': reportingIds[url],
+              'clickX': urlParamMap[CLICK_X_URL_KEY],
+              'clickY': urlParamMap[CLICK_Y_URL_KEY],
+              'creativeDims': getCreativeDimensions()
+              };
+            parent.postMessage(JSON.stringify(message), '*');
+          }
+          url = appendExitClickParams(url);
+          if (relegateNavigation === 'parent') {
+            var message = {'clickTag': url, 'isPostClickTag': true};
+            parent.postMessage(JSON.stringify(message), '*');
+          } else {
+            var args = [url, name];
+            var windowFeatures = '';
+
+            if (features) {
+              windowFeatures = windowFeatures.concat(features);
+            }
+            if (isNewtonTokenSet &&
+                !!document.featurePolicy?.allowedFeatures().includes(
+                  'attribution-reporting')) {
+              if (features) {
+                if (!features.includes('attributionsrc')) {
+                  windowFeatures = windowFeatures.concat(features, ', attributionsrc');
+                }
+              } else {
+                windowFeatures = windowFeatures.concat('attributionsrc');
+              }
+            }
+
+            if (windowFeatures) {
+              args.push(windowFeatures);
+            }
+            open.apply(window,args);
+          }
+        };
+      }(window.open);
+    }
+
+    if (window.addEventListener) {
+      window.addEventListener(
+          'message', handleClickTagMessage, false);
+      window.addEventListener('mousedown', storeClickCoordinates, true);
+    } else {
+      window.attachEvent('onmessage', handleClickTagMessage);
+    }
+  })();
+    
+  </script><style>.village-iframe{width:100%;height:100%;border:none;display:block;position:fixed;top:0;left:0;z-index:2147483647;background:#0000003d;color-scheme:light}.village-iframe.village-loading{display:flex;justify-content:center;align-items:center}.village-iframe>.village-spinner{width:1.5rem;height:1.5rem;border:2px solid #000;border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;animation:spin .45s linear infinite}.village-iframe.village-hidden{display:none}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.village-hidden{display:none}[village-paths-data=facepiles]{display:flex;align-items:center;padding-right:.5rem}[village-paths-data=facepiles] img{width:1.5rem;height:1.5rem;border-radius:50%;margin-right:-.5rem}[village-paths-data=facepiles] img.village-facepiler-avatar-not-found{filter:blur(7px)}[village-paths-data=facepiles] img:last-child{margin-right:0}[village-paths-data=count]{padding-right:.25rem}[village-paths-availability=error],[village-paths-availability=found],[village-paths-availability=not-found],[village-paths-availability=not-activated]{display:none!important}[village-paths-availability=loading]{display:inline-flex!important}</style><meta name="ad.size" content="width=300,height=600"><meta http-equiv="origin-trial" content="A4AD7vbM2W0e5fHylDM4fFrsUvtmQ95U+ZVrdOdh3fgH0l0e7RVkAsZryrSQIRhPVvmC60wTlh880eDyo+HpXQAAAABueyJvcmlnaW4iOiJodHRwczovL3MwLjJtZG4ubmV0OjQ0MyIsImZlYXR1cmUiOiJQcml2YWN5U2FuZGJveEFkc0FQSXMiLCJleHBpcnkiOjE2OTUxNjc5OTksImlzVGhpcmRQYXJ0eSI6dHJ1ZX0="></head>
+  <body>
+    <div id="ad" style="width: 300px; height: 600px; background-color: rgb(0, 100, 255);">
+      <div id="content" style="visibility: visible;">
+        <!-- Ad HTML content here -->
+
+        <div id="vid_container" style="opacity: 0;"></div>
+
+
+
+        <div id="mc_endframe" class="lockup">    
+
+          <div id="mc_features">
+
+            <div id="mc_feature_01" class="feature" style="translate: none; rotate: none; scale: none; transform: translate(75px, 0px);">
+              <div id="mc_img_feature_01" class="img_feature">
+               
+               <svg id="svg_feature_01" viewBox="0 0 450 169" width="450" height="169" x="0" y="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                 <defs>
+                   <mask id="feature_01_mask" width="100%" height="100%" x="0" y="0" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                      <!-- CONTAINER--><path id="feature_01_msk" fill="white" d="M72.9,0h376.1s-72.9,169.5-72.9,169.5H-.5L72.9,0Z"></path>
+                      
+                   </mask>
+
+               
+                  </defs>
+
+                  <g id="img_feature_01_masked" mask="url(#feature_01_mask)">
+                   <image id="img_feature_01" mask="url(#feature_01_mask)" width="100%" height="100%" x="0" y="0" xlink:href="https://2508a-pplus-html-dynamic-amom.s3-us-west-2.amazonaws.com/broad-beat-1/300x600/img_g3_feature_01_bg.jpg"></image>
+                   <image id="img_show_01_svg" class="showTitle dropShadow" width="100%" height="100%" x="0" y="0" xlink:href="https://2508a-pplus-html-dynamic-amom.s3-us-west-2.amazonaws.com/broad-beat-1/300x600/img_g3_show_01.png" style="opacity: 0; visibility: hidden;"></image>
+                 </g>
+                </svg>
+              </div>
+            
+              <!-- <img id="img_feature_03_rating" class="img_feature rating" src="img_feature_03_bg.jpg"> -->
+            </div>
+
+
+            
+
+
+
+            <div id="mc_feature_02" class="feature" style="translate: none; rotate: none; scale: none; transform: translate(100px, 0px);">
+              <div id="mc_img_feature_02" class="img_feature">
+               
+               <svg id="svg_feature_02" viewBox="0 0 450 169" width="450" height="169" x="0" y="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                 <defs>
+                   <mask id="feature_02_mask" width="100%" height="100%" x="0" y="0" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                      <!-- CONTAINER--><path id="feature_01_msk" fill="white" d="M72.9,0h376.1s-72.9,169.5-72.9,169.5H-.5L72.9,0Z"></path>
+                      
+                   </mask>
+                  </defs>
+
+                  <g id="img_feature_02_masked" mask="url(#feature_02_mask)">
+                   <image id="img_feature_02" mask="url(#feature_02_mask)" width="100%" height="100%" x="0" y="0" xlink:href="https://2508a-pplus-html-dynamic-amom.s3-us-west-2.amazonaws.com/broad-beat-1/300x600/img_g3_feature_02_bg.jpg"></image>
+                   <image id="img_show_02_svg" class="showTitle dropShadow" width="100%" height="100%" x="0" y="0" xlink:href="https://2508a-pplus-html-dynamic-amom.s3-us-west-2.amazonaws.com/broad-beat-1/300x600/img_g3_show_02.png" style="opacity: 0; visibility: hidden;"></image>
+                 </g>
+                </svg>
+              </div>
+           
+              <!-- <img id="img_feature_03_rating" class="img_feature rating" src="img_feature_03_bg.jpg"> -->
+            </div>
+
+            <!-- <div id="img_show_02" class="showTitle">
+              <img class="dropShadow" src="img_show_02.png">
+            </div> -->
+
+
+
+            <div id="mc_feature_03" class="feature" style="translate: none; rotate: none; scale: none; transform: translate(125px, 0px);">
+              <div id="mc_img_feature_03" class="img_feature">
+               <svg id="svg_feature_03" viewBox="0 0 450 169" width="450" height="169" x="0" y="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                 <defs>
+                   <mask id="feature_03_mask" width="100%" height="100%" x="0" y="0" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                      <!-- CONTAINER--><path id="feature_03_msk" fill="white" d="M72.9,0h376.1s-72.9,169.5-72.9,169.5H-.5L72.9,0Z"></path>
+                   </mask>
+
+                  </defs>
+
+                  <g id="img_feature_03_masked" mask="url(#feature_03_mask)">
+                   <image id="img_feature_03" mask="url(#feature_03_mask)" width="100%" height="100%" x="0" y="0" xlink:href="https://2508a-pplus-html-dynamic-amom.s3-us-west-2.amazonaws.com/broad-beat-1/300x600/img_g3_feature_03_bg.jpg"></image>
+                   <image id="img_show_03_svg" class="showTitle dropShadow" width="100%" height="100%" x="0" y="0" xlink:href="https://2508a-pplus-html-dynamic-amom.s3-us-west-2.amazonaws.com/broad-beat-1/300x600/img_g3_show_03.png" style="opacity: 0; visibility: hidden;"></image>
+                 </g>
+            
+                    
+                </svg>
+              </div>
+              
+            </div>
+
+
+            <div id="img_shadow" style="translate: none; rotate: none; scale: none; transform: translate(125px, 0px);">
+              <svg id="svg_feature_03" viewBox="0 0 500 150" width="500" height="150" x="0" y="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                 <defs>
+                   <mask id="shadow_mask" width="100%" height="100%" x="0" y="0" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                      <!-- CONTAINER--><path id="feature_03_msk" fill="white" d="M511,174H0V55.5h476.1l35.1-80.6v199.1Z"></path>
+                   </mask>
+                  </defs>
+                   <image mask="url(#shadow_mask)" width="100%" height="100%" x="0" y="0" xlink:href="img_shadow.jpg"></image>
+                </svg>
+            </div>
+            <!-- <img id="img_show_03" class="showTitle dropShadow" src="img_show_03.png"> -->
+
+          </div>
+
+
+
+
+
+          <div id="feature_02_date" class="hide">
+                <svg id="svg_feature_02" viewBox="0 0 60 20" width="60" height="20" x="0" y="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                   <defs>
+                     <mask id="feature_02_date_mask" width="100%" fill="none" height="100%" x="0" y="0" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+                        <!-- START--><path id="feature_02_date_msk" fill="white" d="M8,.5c15.5,0-15,0,.5,0C5.8,6.8,3.2,13.2.5,19.5c-15.3,0,15.3,0,0,0v-.5C3,12.8,5.5,6.7,8,.5Z"></path>
+                        <!-- FINISH --><path id="feature_02_date_msk_end" fill="none" d="M8,.5h46.5c-2.7,6.3-5.3,12.7-8,19H.5v-.5C3,12.8,5.5,6.7,8,.5Z"></path>
+                     </mask>
+                    </defs>
+
+                    <g mask="url(#feature_02_date_mask)">
+                      <path id="rect" fill="#0064ff" d="M8,.5h60.5c-2.7,6.3-5.3,12.7-8,19H.5v-.5C3,12.8,5.5,6.7,8,.5Z"></path>
+                     <image id="img_feature_02_date" width="100%" height="100%" x="0" y="0" xlink:href=""></image>
+                   </g>
+                </svg>
+              </div>
+
+
+
+
+
+          <div id="paramount_badge" style="translate: none; rotate: none; scale: none; transform: translate(100px, 0px) scale(0.33, 0.33); opacity: 0; visibility: hidden;"><img src="./img_badge.png"></div>
+
+          <div id="mc_amom">
+            <div id="mc_headline_top">
+              
+               <svg class="headline" viewBox="0 0 300 40" fill="white" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="translate: none; rotate: none; scale: none; transform: translate(60px, 0px);">
+                    <path class="footer_headline_word" d="M62.7,21.8h-4.8l-6.5,17.2h4.4l1.1-3.2h6.2l1.1,3.2h5l-6.5-17.2ZM58.3,32.1l1.7-5,1.9,5h-3.6Z" data-svg-origin="51.400001525878906 21.799999237060547" transform="matrix(1,0,0,1,0,40)" style="translate: none; rotate: none; scale: none; transform-origin: 0px 0px;"></path>
+
+                    <path class="footer_headline_word" d="M86,31.7l-4.5-9.9h-4.8v17.2h4.4v-9l3.9,9h2l3.7-9.1v9.1h4.4v-17.2h-4.8l-4.2,9.9ZM105.5,21.5c-5.1,0-8.9,3.8-8.9,8.9s3.8,8.9,8.9,8.9,8.9-3.8,8.9-8.9-3.8-8.9-8.9-8.9ZM105.5,34.9c-2.3,0-3.9-1.6-3.9-4.5s1.6-4.6,3.9-4.6,3.9,1.6,3.9,4.6-1.6,4.5-3.9,4.5ZM126.7,31.5c0,2.2-.8,3.4-2.9,3.4s-2.9-1.2-2.9-3.4v-9.7h-4.9v10.7c0,4.4,3.1,6.8,7.9,6.8s7.8-2.4,7.8-6.8v-10.7h-4.9v9.7ZM145.3,31.2l-7.2-9.4h-4v17.2h4.4v-9.3l7.2,9.3h4v-17.2h-4.4v9.4ZM164.4,21.8h-13.6v4.1h4.4v13h4.9v-13h4.4v-4.1ZM168.7,21.8l-6.5,17.2h4.4l1.1-3.2h6.2l1.1,3.2h5l-6.5-17.2h-4.8ZM169,32.1l1.7-5,1.9,5h-3.6ZM180.7,39h4.9v-17.2h-4.9v17.2ZM199.4,21.8v9.4l-7.2-9.4h-4v17.2h4.4v-9.3l7.2,9.3h4v-17.2h-4.4Z" data-svg-origin="76.69999694824219 21.5" transform="matrix(1,0,0,1,0,40)" style="translate: none; rotate: none; scale: none; transform-origin: 0px 0px;"></path>
+                    
+                    <path class="footer_headline_word" d="M220.7,21.5c-5.1,0-8.9,3.8-8.9,8.9s3.8,8.9,8.9,8.9,8.9-3.8,8.9-8.9-3.8-8.9-8.9-8.9ZM220.7,34.9c-2.3,0-3.9-1.6-3.9-4.5s1.6-4.6,3.9-4.6,3.9,1.6,3.9,4.6-1.6,4.5-3.9,4.5ZM243.6,25.9v-4.1h-12.4v17.2h4.9v-6.8h6.3v-4.1h-6.3v-2.1h7.4Z" data-svg-origin="211.8000030517578 21.5" transform="matrix(1,0,0,1,0,40)" style="translate: none; rotate: none; scale: none; transform-origin: 0px 0px;"></path>
+
+                 </svg></div>
+
+               <div id="mc_headline_btm">
+                
+               <svg class="headline" viewBox="0 0 300 40" fill="white" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="translate: none; rotate: none; scale: none; transform: translate(60px, 0px);">
+                      
+                      <path class="footer_headline_word" d="M248.2,3.3c0,1.3-.9,2.2-2.2,2.2s-2.2-.9-2.2-2.2.9-2.2,2.2-2.2,2.2.9,2.2,2.2ZM244.3,3.3c0,1.1.7,1.8,1.8,1.8s1.8-.8,1.8-1.8-.8-1.8-1.8-1.8-1.8.8-1.8,1.8ZM245.6,4.5h-.5V2h1c.7,0,1.1.3,1.1.8s-.2.6-.6.7l.6,1h-.5l-.6-1h-.5v1ZM245.6,3.2h.5c.4,0,.6,0,.6-.4s-.2-.4-.6-.4h-.5v.8ZM81,19.2l-7.9,19.3h-4.2l-8.3-19.1v19.1h-9.4V1.9h10.3l9.6,21.1L80.1,1.9h10.3v36.6h-9.4v-19.3ZM131.7,20.2c0,10.9-8.2,19-19,19s-19-8.1-19-19S101.8,1.2,112.6,1.2s19,8.2,19,19ZM120.9,20.2c0-6.3-3.9-9.7-8.3-9.7s-8.3,3.4-8.3,9.7,3.4,9.6,8.3,9.6,8.3-3.3,8.3-9.6ZM129.4,1.9h11.6l7.9,22.7,8.1-22.7h10.3l-13.9,36.6h-10.2L129.4,1.9ZM179.2,38.5h-10.5V1.9h10.5v36.6ZM210.3,38.5h-26.4V1.9h26.4v8.8h-15.9v4.4h13.4v8.8h-13.4v5.8h15.9v8.8ZM218.4,25.5c1.4,2.2,4,4.9,9.5,4.9s5-.8,5-2.4-.7-2.4-6.7-3.7c-9.8-2.1-12.5-6-12.5-12s6-11.1,14.8-11.1,12.1,3.3,14.3,6.1l-5.7,6.7c-1.7-2.1-5.3-3.9-8.8-3.9s-4.1.7-4.1,2,.8,2.4,7.2,3.8c7.9,1.7,12,4.7,12,11.7s-5.5,11.8-15.5,11.8-13.9-4.1-16.2-6.8l6.7-7Z" data-svg-origin="51.20000457763672 1.0999999046325684" transform="matrix(1,0,0,1,0,40)" style="translate: none; rotate: none; scale: none; transform-origin: 0px 0px;"></path>
+                 </svg></div>
+          </div>
+
+
+
+
+
+        <div id="cta" style="width: 87px; height: 19px; left: 53px; bottom: 19px;">
+          <div id="cta_bg" style="border-radius: 8px; translate: none; rotate: none; scale: none; transform-origin: 50% 50%; transform: scale(0, 1); background-color: white;"></div>
+          
+
+
+        <svg id="cta_txt" fill="white" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="87" height="19" viewBox="0 0 87 19" style="translate: none; rotate: none; scale: none; transform-origin: 50% 50%; opacity: 0; transform: scale(0.5, 0.5);">
+            <path d="M13.3,9.2l-.9,3.8h-2.1l-1.8-7h2.2l.9,4.4,1-4.4h1.5l1,4.4.9-4.4h2.2l-1.8,7h-2.1l-.9-3.8ZM23.3,11.7h-2.6l-.4,1.3h-1.8l2.7-7h2l2.7,7h-2l-.5-1.3ZM21.2,10.2h1.5l-.8-2.1-.7,2.1ZM27.7,7.7h-1.8v-1.7h5.6v1.7h-1.8v5.3h-2v-5.3ZM32.6,9.5c0-2.2,1.6-3.6,3.7-3.6s2.3.5,2.9,1.4l-1.3,1.3c-.2-.4-.6-.9-1.5-.9s-1.6.7-1.6,1.9.6,1.8,1.6,1.8,1.3-.5,1.6-.9l1.3,1.3c-.6.8-1.6,1.4-2.9,1.4-2.1,0-3.6-1.5-3.6-3.6ZM47.1,6v7h-2v-2.8h-2.4v2.8h-2v-7h2v2.4h2.4v-2.4h2ZM54.6,9.2v3.8h-1.8v-7h1.7l3,3.8v-3.8h1.8v7h-1.7l-3-3.8ZM68.2,9.5c0,2.1-1.6,3.6-3.7,3.6s-3.7-1.6-3.7-3.6,1.6-3.6,3.7-3.6,3.7,1.6,3.7,3.6ZM66.1,9.5c0-1.2-.8-1.9-1.6-1.9s-1.6.7-1.6,1.9.7,1.8,1.6,1.8,1.6-.6,1.6-1.8ZM73.8,9.2l-.9,3.8h-2.1l-1.8-7h2.2l.9,4.4,1-4.4h1.5l1,4.4.9-4.4h2.2l-1.8,7h-2.1l-.9-3.8Z" style="fill: rgb(0, 50, 150);"></path>
+          </svg></div>
+        
+      
+        <img id="img_disclaimer" class="lockup dropShadow hide" src="./img_disclaimer.png">
+
+
+        <!-- <div id="cta_rad_grad"></div> -->
+
+        <div id="dates" style="display:none;">
+          <div id="pre" style="visibility: hidden;">
+            <!-- Ad pre content here -->
+            Pre Content
+          </div>
+          <div id="day_of" style="visibility: hidden;">
+            <!-- Ad day of content here -->
+            Day Of Content
+          </div>
+          <div id="post" style="visibility: hidden;">
+            <!-- Ad post content here -->
+            Post Content
+          </div>
+        </div>
+      </div>
+
+
+      
+
+
+          <div id="mc_pplus_intro" class="lockup" style="translate: none; rotate: none; scale: none; transform: translate3d(0px, 0px, 0px) scale(1.0306, 1.0306);">
+
+            <div id="white_cover" class="lockup"></div>
+            <div id="grad_sweep" class="skewed" style="translate: none; rotate: none; scale: none; transform: translate(310px, 0px) skew(-22.9998deg, 0deg); opacity: 0; visibility: hidden;"></div>
+
+            <svg class="svgs" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="600" viewBox="0 0 300 600">
+
+              <defs>
+                   
+                 
+                  <filter id="doors_blur" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+                    <fegaussianblur stdDeviation="6,0"></fegaussianblur>
+                  </filter>
+
+                  <mask id="intro_mask" width="100%" height="100%" x="0" y="0" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+
+                      <rect id="intro_msk_cover" fill="white" width="300" height="600"></rect>
+                      <!-- FULLVIEW--><path id="intro_msk_left" filter="url(#doors_blur)" fill="white" d="M112.6,600H-42V0h413.8L112.6,600Z"></path>
+                      <!-- SPLIT --><path id="intro_msk_right" filter="url(#doors_blur)" fill="white" d="M371.8,0h74.2v600H112.6L371.8,0Z"></path>
+                      
+                   </mask>
+
+
+               </defs>
+
+              <g mask="url(#intro_mask)">
+                <rect fill="#0064ff" width="300" height="600"></rect>
+                <image width="100%" height="100%" x="0" y="0" xlink:href="img_badge_lrg.png"></image>
+              </g>
+            </svg>
+
+
+            
+          <svg id="g_plus" class="svgs" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="600" viewBox="0 0 300 600" style="translate: none; rotate: none; scale: none; transform-origin: 232px 323px; transform: translate3d(0px, 0px, 0px) scale(1.4679, 1.4679);">
+              <path id="pplus_horiz_line" fill="white" d="M244.2,321.2l-1.6,3.7h-23.7l1.6-3.7h23.7Z"></path>
+                <path id="pplus_h_end" fill="none" d="M233.1,324.8h-4.5l1.6-3.7h4.5l-1.6,3.7Z"></path>
+
+                <path id="pplus_vert_line" fill="white" d="M229.2,333.6h-4.5l9.2-21.2h4.5l-9.2,21.2Z"></path>
+                <path id="pplus_v_end" fill="none" d="M82.7,648h11.6L375.6-2h-6.6L87.6,648h-4.8Z"></path>
+            </svg></div>
+
+      </div>
+
+      <!-- <img id="f01" class="lockup" src="f01.jpg" style="opacity:0.3;"> -->
+
+      <!-- <img id="poster"/> -->
+      <div id="loading" style="background-color: rgb(0, 100, 255); opacity: 0; visibility: hidden;"><img src="./loader.svg"></div>
+
+
+      <div id="border" style="visibility: visible;">
+        <div class="line hor " style="background-color: rgb(0, 0, 0);"></div>
+        <div class="line hor" style="background-color: rgb(0, 0, 0);"></div>
+        <div class="line ver" style="background-color: rgb(0, 0, 0);"></div>
+        <div class="line ver" style="background-color: rgb(0, 0, 0);"></div>
+      </div>
+
+      <!-- <div id="hits" onClick="javascript:window.open(window.clickTag)"></div> -->
+
+      <svg id="hits" class="lockup svgs" onclick="javascript:window.open(window.clickTag)" width="300" height="600" viewBox="0 0 300 600">
+        <path id="hit_01" fill="transparent" d="M.5,0h299.5v172.7H.5V0Z"></path>
+        <path id="hit_02" fill="transparent" d="M0,172.7h299.5v166.7H0v-166.7Z"></path>
+        <path id="hit_03" fill="transparent" d="M0,339.4h299.5v166.7H0v-166.7Z"></path>
+
+    </svg></div>
+    <!-- <script src="https://s0.2mdn.net/ads/studio/Enabler.js"></script> -->
+    <script src="./gsap_3.11.5_min.js"></script>
+    <script src="./customease_3.11.5_min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.1/src/js.cookie.min.js"></script> -->
+    <script src="./bundle.js"></script>
+  
+</body></html>
